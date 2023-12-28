@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, useNavigate} from 'react-router-dom';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { adminLogout } from '../feature/Admin/adminAuthSlice';
+import axiosInstance from '../app/axiosInstance';
 
 
 const AdminSidebar = () => {
@@ -10,7 +10,7 @@ const AdminSidebar = () => {
     const dispatch = useDispatch()
     const handleAdminLogout = async ()=>{
         try {
-            await axios.post('http://localhost:4000/admin/logout');
+            await axiosInstance.post('/admin/logout');
             dispatch(adminLogout())
             navigate('/admin/login')
         } catch (error) {

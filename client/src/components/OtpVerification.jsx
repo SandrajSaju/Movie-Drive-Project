@@ -1,8 +1,8 @@
-import React,{useState} from 'react'
-import axios from 'axios';
+import React,{useState} from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {toast} from 'react-toastify'
+import axiosInstance from '../app/axiosInstance';
 
 const OtpVerification = () => {
     const navigate = useNavigate()
@@ -18,9 +18,8 @@ const OtpVerification = () => {
     const verifyOtp = async(e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:4000/actor/verifyotp',{enteredOtp,email,otp})
+            await axiosInstance.post('/actor/verifyotp',{enteredOtp,email,otp})
             toast.success("Verification Successfull");
-            
             navigate('/actor/login')
         } catch (error) {
             toast.error(error.response.data.error)

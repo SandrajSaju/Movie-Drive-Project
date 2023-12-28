@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import axios from 'axios';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import {toast} from 'react-toastify';
 import {useDispatch} from 'react-redux'
 import { setActorOtpCredentials } from '../feature/Actor/actorOtpSlice';
+import axiosInstance from '../app/axiosInstance';
 
 function ActorSignup() {
     const navigate = useNavigate()
@@ -27,7 +27,7 @@ function ActorSignup() {
     const handleActorSignUp = async (e) => {
         e.preventDefault();
         try {
-            const {data} = await axios.post('http://localhost:4000/actor/signup', formData);
+            const {data} = await axiosInstance.post('/actor/signup', formData);
             console.log(data);
             dispatch(setActorOtpCredentials({...data}))
             toast.success("OTP sent to Email")

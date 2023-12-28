@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../app/axiosInstance';
 
 const AdminListActors = ({ actors, fetchActors }) => {
     console.log(actors);
 
     const handleBlockActor = async (id) => {
         try {
-            await axios.post(`http://localhost:4000/admin/blockactor/${id}`, null, {
-                headers: {
-                    "adminauthorization": localStorage.getItem('adminToken')
-                }
-            });
+            await axiosInstance.post(`/admin/blockactor/${id}`);
             fetchActors();
         } catch (error) {
 
@@ -19,11 +15,7 @@ const AdminListActors = ({ actors, fetchActors }) => {
 
     const handleUnblockActor = async (id) => {
         try {
-            await axios.post(`http://localhost:4000/admin/unblockactor/${id}`, null, {
-                headers: {
-                    "adminauthorization": localStorage.getItem('adminToken')
-                }
-            });
+            await axiosInstance.post(`/admin/unblockactor/${id}`);
             fetchActors();
         } catch (error) {
 

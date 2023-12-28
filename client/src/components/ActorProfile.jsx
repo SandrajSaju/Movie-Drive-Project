@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
 import { setActorCredentials } from '../feature/Actor/actorAuthSlice';
 import { toast } from 'react-toastify'
+import axiosInstance from '../app/axiosInstance';
 
 const ActorProfile = () => {
-    const token = localStorage.getItem('actorToken');
     const { actorInfo } = useSelector(state => state.actorAuth)
     const [isEditing, setIsEditing] = useState(false);
     const [isAddingVideos, setIsAddingVideos] = useState(false);
@@ -98,10 +97,9 @@ const ActorProfile = () => {
                 formData.append('image', selectedImage);
             }
 
-            const { data } = await axios.patch('http://localhost:4000/actor/updateprofile', formData, {
+            const { data } = await axiosInstance.patch('/actor/updateprofile', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'ActorAuthorization': token
+                    'Content-Type': 'multipart/form-data'
                 }
             });
             dispatch(setActorCredentials(data.actor))
@@ -115,10 +113,9 @@ const ActorProfile = () => {
         try {
             const formData = new FormData();
             formData.append("video",video);
-            const {data} = await axios.post('http://localhost:4000/actor/uploadvideo',formData,{
+            const {data} = await axiosInstance.post('/actor/uploadvideo',formData,{
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'ActorAuthorization': token
+                    'Content-Type': 'multipart/form-data'
                 }
             });
             dispatch(setActorCredentials(data.actor))

@@ -1,8 +1,9 @@
 const Director = require('../models/directorModel');
 const CastingCall = require('../models/castingCallModel');
 const Application = require('../models/applicationModel');
-const { generateDirectorToken } = require('../utils/generateToken');
+const { generateToken } = require('../utils/generateToken');
 const ImageKit = require("imagekit");
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -13,10 +14,13 @@ const directorLogin = async (req, res) => {
             return res.status(400).json({ error: "Please enter email and password" })
         }
         const director = await Director.findOne({ email })
-        if (director) {
+        if (director && director.isVerified === true) {
+            if(!director.isAdminApproved){
+                return res.status(400).json({ error: "Your Verification by Admin is under Process" })
+            }
             const isPasswordMatch = await bcrypt.compare(password, director.password)
             if (isPasswordMatch) {
-                const directorToken = generateDirectorToken(res, director._id)
+                const directorToken = generateToken(res, director._id, "director")
                 res.status(200).json({
                     director: director,
                     directorToken: directorToken
@@ -43,18 +47,87 @@ const directorSignup = async (req, res) => {
         }
         const existingDirector = await Director.findOne({ email });
         if (!existingDirector) {
-            const hashedPassword = await bcrypt.hash(password, saltRounds)
-            const newDirector = new Director({
-                name,
-                email,
-                password: hashedPassword
-            })
-            await newDirector.save()
-            res.status(201).json(newDirector)
+            if (req.files && req.files.length > 0) {
+                const imageKit = new ImageKit({
+                    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+                    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+                    urlEndpoint: process.env.IMAGEKIT_URL_END_POINT,
+                });
+                const uploadPromises = req.files.map((file) => {
+                    return new Promise((resolve, reject) => {
+                        imageKit.upload(
+                            {
+                                file: file.buffer,
+                                fileName: `${Date.now()}-${file.originalname}`
+                            },
+                            (error, result) => {
+                                if (error) {
+                                    console.log("Error uploading image to imagekit", error);
+                                    reject(error)
+                                } else {
+                                    resolve(result.url);
+                                }
+                            }
+                        );
+                    });
+                });
+                try {
+                    const uploadImageUrls = await Promise.all(uploadPromises);
+                    const hashedPassword = await bcrypt.hash(password, saltRounds)
+                    const newDirector = new Director({
+                        name,
+                        email,
+                        certificates: uploadImageUrls,
+                        password: hashedPassword
+                    })
+                    await newDirector.save()
+                    if (newDirector) {
+                        let otp = Math.floor(Math.random() * 900000) + 100000;
+
+                        let transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: "sandrajdevamangalam@gmail.com",
+                                pass: process.env.EMAIL_PASSWORD
+                            }
+                        });
+
+                        let mailOptions = {
+                            from: "sandrajdevamangalam@gmail.com",
+                            to: email,
+                            subject: "Movie Drive Director Otp Verification Mail",
+                            text: `Welcome to Movie Drive developed by Sandraj Saju.Your Otp for Verification is ${otp}.`
+                        };
+
+                        transporter.sendMail(mailOptions, function (error, info) {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                console.log("Email sent:" + info.response);
+                            }
+                        });
+
+                        res.status(201).json({
+                            email: newDirector.email,
+                            otp: otp
+                        });
+                    } else {
+                        res.status(400).json({ error: "Invalid Director Data" })
+                    }
+                } catch (error) {
+                    console.log(error.message);
+                    res.status(500).json({ message: "Error Uploading certificates to CDN" })
+                }
+            }else{
+                return res.status(400).json({ error: "Please upload certificates" })
+            }
+
         } else {
             return res.status(400).json({ error: "Director already registered" })
         }
+
     } catch (error) {
+        console.log(error.message)
         res.status(400).json({ error: error.message });
     }
 }
@@ -64,6 +137,27 @@ const directorLogout = (req, res) => {
         success: true,
         message: 'Logout Successful'
     })
+}
+
+const directorVerifyOtp = async (req, res) => {
+    try {
+        const { enteredOtp, otp, email } = req.body;
+        if (enteredOtp == otp) {
+            const director = await Director.findOne({ email });
+            if (director) {
+                director.isVerified = true;
+                await director.save();
+                res.status(200).json("Otp Verified");
+            } else {
+                res.status(400).json("Director Not Found")
+            }
+        } else {
+            res.status(400).json({ error: "Enter Valid Otp" })
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.status(400).json({ error: error.message });
+    }
 }
 
 const createCastingCall = async (req, res) => {
@@ -212,17 +306,16 @@ const editCastingCall = async (req, res) => {
     }
 };
 
-const directorGetApplications = async (req,res) => {
+const directorGetApplications = async (req, res) => {
     try {
-        const {id} = req.params;
-        const applications = await Application.find({castingCall:id,status:{$ne:"Cancelled"}}).populate('actor').populate({
-            path:'castingCall',
-            populate:{
-                path:'director',
-                model:'Director'
+        const { id } = req.params;
+        const applications = await Application.find({ castingCall: id, status: { $ne: "Cancelled" } }).populate('actor').populate({
+            path: 'castingCall',
+            populate: {
+                path: 'director',
+                model: 'Director'
             }
         });
-        console.log(applications);
         res.status(200).json(applications);
     } catch (error) {
         console.log(error.message);
@@ -230,26 +323,26 @@ const directorGetApplications = async (req,res) => {
     }
 }
 
-const directorApproveActor = async (req,res) => {
+const directorApproveActor = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const application = await Application.findById(id);
         application.status = 'Approved';
         await application.save();
-        res.status(200).json({message:"Application Approved"})
+        res.status(200).json({ message: "Application Approved" })
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ error: error.message });
     }
 }
 
-const directorRejectActor = async (req,res) => {
+const directorRejectActor = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         const application = await Application.findById(id);
         application.status = 'Rejected';
         await application.save();
-        res.status(200).json({message:"Application Rejected"});
+        res.status(200).json({ message: "Application Rejected" });
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ error: error.message });
@@ -266,5 +359,6 @@ module.exports = {
     editCastingCall,
     directorGetApplications,
     directorApproveActor,
-    directorRejectActor
+    directorRejectActor,
+    directorVerifyOtp
 }

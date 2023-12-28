@@ -1,7 +1,7 @@
 import React,{useEffect} from 'react';
 import { useDispatch,useSelector } from 'react-redux';
 import { getActorApplications } from '../feature/Applications/actorApplicationsSlice';
-import axios from 'axios';
+import axiosInstance from '../app/axiosInstance';
 
 const ActorApplications = () => {
     const dispatch = useDispatch();
@@ -12,11 +12,7 @@ const ActorApplications = () => {
 
     const handleCancelApplication = async (castingCallId,applicationId) =>{
         try {
-            await axios.post(`http://localhost:4000/actor/cancelapplication/${castingCallId}/${applicationId}`,null,{
-                headers:{
-                    "ActorAuthorization":localStorage.getItem("actorToken")
-                }
-            })
+            await axiosInstance.post(`/actor/cancelapplication/${castingCallId}/${applicationId}`)
             dispatch(getActorApplications())
         } catch (error) {
             console.log(error);
@@ -45,7 +41,7 @@ const ActorApplications = () => {
                                 <td className="border-b"><img className='w-20 h-16 object-cover object-center m-auto' src={application.castingCall.image} alt='' /></td>
                                 <td className="py-2 px-4 border-b text-center">{application.castingCall.castingCallTitle}</td>
                                 <td className="py-2 px-4 border-b text-center">{application.castingCall.roleDescription}</td>
-                                <td className="py-2 px-4 border-b text-center">{application.castingCall.director.name}</td>
+                                <td className="py-2 px-4 border-b text-center">{application.castingCall?.director?.name}</td>
                                 <td className="py-2 px-4 border-b text-center">{application.castingCall.compensation}</td>
                                 <td className="py-2 px-4 border-b text-center font-bold">{application.status}</td>
                                 <td className="py-2 px-4 border-b text-center space-x-3">

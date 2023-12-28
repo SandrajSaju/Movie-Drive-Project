@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { actorDetailedCastingCall } from '../feature/CastingCalls/castingCallsSlice';
 import { useDispatch } from 'react-redux';
+import axiosInstance from '../app/axiosInstance';
 
 
 function ActorCastingCalls() {
-  const token = localStorage.getItem('actorToken');
   const [castingCalls, setCastingCalls] = useState([])
   const dispatch = useDispatch()
 
@@ -15,10 +14,9 @@ function ActorCastingCalls() {
 
     const getAllCastingCalls = async () => {
       try {
-        const { data } = await axios.get('http://localhost:4000/actor/castingcalls', {
+        const { data } = await axiosInstance.get('/actor/castingcalls', {
           headers: {
-            'Content-Type': 'application/json',
-            'ActorAuthorization': token
+            'Content-Type': 'application/json'
           }
         });
         setCastingCalls(data)
@@ -29,7 +27,7 @@ function ActorCastingCalls() {
 
     getAllCastingCalls()
 
-  }, [token])
+  }, [])
 
   const viewDetailsHandler = (id) => {
     dispatch(actorDetailedCastingCall(id))

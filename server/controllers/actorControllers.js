@@ -1,5 +1,5 @@
 const Actor = require('../models/actorModel');
-const { generateActorToken } = require('../utils/generateToken');
+const { generateToken } = require('../utils/generateToken');
 const CastingCall = require('../models/castingCallModel');
 const Application = require('../models/applicationModel');
 const ImageKit = require("imagekit");
@@ -21,7 +21,7 @@ const actorLogin = async (req, res) => {
                 if (actor.isBlocked === true) {
                     return res.status(400).json({ error: "Your Account is been blocked" });
                 }
-                const actorToken = generateActorToken(res, actor._id)
+                const actorToken = generateToken(res, actor._id,"actor")
                 res.status(200).json({ actor, actorToken })
             } else {
                 return res.status(400).json({ error: "Email or password does not match" });

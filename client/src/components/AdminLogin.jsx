@@ -1,9 +1,9 @@
 import React,{useState} from 'react'
 import { setAdminCredentials, setAdminToken } from '../feature/Admin/adminAuthSlice';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'
+import axiosInstance from '../app/axiosInstance';
 
 const AdminLogin = () => {
     const dispatch = useDispatch()
@@ -24,7 +24,7 @@ const AdminLogin = () => {
     const handleAdminLogin = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('http://localhost:4000/admin/login', formData);
+            const { data } = await axiosInstance.post('/admin/login', formData);
             console.log(data);
             dispatch(setAdminCredentials(data.email));
             dispatch(setAdminToken(data.adminToken));

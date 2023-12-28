@@ -23,6 +23,7 @@ import AdminProtect from './utils/AdminProtect';
 import DirectorApplicationsScreen from './screens/DirectorApplicationsScreen';
 import DirectorApplicantsListScreen from './screens/DirectorApplicantsListScreen';
 import ActorApplicationsScreen from './screens/ActorApplicationsScreen';
+import DirectorOtpVerificationScreen from './screens/DirectorOtpVerificationScreen';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
           <Route path='/explore' element={<AppExploreScreen />} />
           <Route path='/director/signup' element={<DirectorSignupScreen />} />
           <Route path='/director/login' element={<DirectorLoginScreen />} />
+          <Route path='/director/verifyotp' element={<DirectorOtpVerificationScreen />} />
         </Route>
 
         <Route element={<Public role='admin' />} >

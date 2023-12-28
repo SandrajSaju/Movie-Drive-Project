@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../app/axiosInstance";
 
 const initialState = {
     loading: false,
@@ -9,13 +9,8 @@ const initialState = {
 }
 
 export const getActorApplications = createAsyncThunk('getActorApplications', async () => {
-    const token = localStorage.getItem('actorToken');
-    console.log(token);
-    const res = await axios.get("http://localhost:4000/actor/getactorapplications",{
-        headers: {
-            'ActorAuthorization': token
-        }
-    })
+    const res = await axiosInstance.get("/actor/getactorapplications")
+    console.log(res.data);
     return res.data
 })
 

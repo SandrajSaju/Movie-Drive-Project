@@ -13,12 +13,12 @@ const directorAuthSlice = createSlice({
             localStorage.setItem('directorInfo', JSON.stringify(action.payload))
         },
         setDirectorToken:(state,action)=>{
-            localStorage.setItem('directorToken', action.payload)
+            localStorage.setItem('token', action.payload)
         },
         directorLogout: (state, action) => {
             state.directorInfo = null;
             localStorage.removeItem("directorInfo")
-            localStorage.removeItem("directorToken")
+            localStorage.removeItem("token")
         }
     }
 });

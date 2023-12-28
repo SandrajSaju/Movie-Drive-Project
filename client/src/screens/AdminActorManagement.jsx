@@ -1,17 +1,13 @@
 import React, { useEffect, useState} from 'react'
 import AdminHeader from '../components/AdminHeader'
 import AdminSidebar from '../components/AdminSidebar'
-import AdminListActors from '../components/AdminListActors'
-import axios from 'axios'
+import AdminListActors from '../components/AdminListActors';
+import axiosInstance from '../app/axiosInstance'
 
 const AdminActorManagement = () => {
     const [allActors,setAllActors] = useState([])
     const fetchActors = async () => {
-      const {data} = await axios.get('http://localhost:4000/admin/getallactors',{
-          headers:{
-              "adminauthorization":localStorage.getItem("adminToken")
-          }
-      });
+      const {data} = await axiosInstance.get('/admin/getallactors');
       setAllActors(data)
   }
     useEffect(()=>{

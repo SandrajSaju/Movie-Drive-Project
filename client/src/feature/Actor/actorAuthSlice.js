@@ -14,12 +14,12 @@ const actorAuthSlice = createSlice({
             localStorage.setItem('actorInfo', JSON.stringify(action.payload))
         },
         setActorToken:(state,action)=>{
-            localStorage.setItem('actorToken', action.payload)
+            localStorage.setItem('token', action.payload)
         },
         actorLogout: (state, action) => {
             state.actorInfo = null;
             localStorage.removeItem("actorInfo");
-            localStorage.removeItem("actorToken");
+            localStorage.removeItem("token");
         }
     }
 });

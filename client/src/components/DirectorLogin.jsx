@@ -1,9 +1,9 @@
 import React,{useState} from 'react';
 import { useNavigate,Link} from 'react-router-dom';
-import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setDirectorCredentials,setDirectorToken } from '../feature/Director/directorAuthSlice';
 import {toast} from 'react-toastify';
+import axiosInstance from '../app/axiosInstance';
 
 const DirectorLogin = () => {
     const navigate = useNavigate()
@@ -26,7 +26,7 @@ const DirectorLogin = () => {
     const handleDirectorLogin = async (e) => {
         e.preventDefault();
         try {
-            const {data} = await axios.post('http://localhost:4000/director/login',formData);
+            const {data} = await axiosInstance.post('/director/login',formData);
             console.log(data);
             dispatch(setDirectorCredentials(data.director));
             dispatch(setDirectorToken(data.directorToken))

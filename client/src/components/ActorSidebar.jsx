@@ -1,18 +1,17 @@
 import React from 'react';
 import { useSelector,useDispatch } from 'react-redux';
-import axios from 'axios';
 import { useNavigate,Link } from 'react-router-dom';
 import { actorLogout } from '../feature/Actor/actorAuthSlice';
+import axiosInstance from '../app/axiosInstance';
 
 function ActorSidebar() {
     const {actorInfo} = useSelector(state=>state.actorAuth);
-    console.log(actorInfo.name);
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const handleActorLogout = async ()=>{
         try {
-            await axios.post('http://localhost:4000/actor/logout');
+            await axiosInstance.post('/actor/logout');
             dispatch(actorLogout())
             navigate('/explore')
         } catch (error) {

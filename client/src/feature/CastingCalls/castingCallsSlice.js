@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../../app/axiosInstance";
 
 const initialState = {
     loading: false,
@@ -9,39 +9,30 @@ const initialState = {
 }
 
 export const getCastingCalls = createAsyncThunk('getCastingCall', async () => {
-    const token = localStorage.getItem('directorToken');
-    const res = await axios.get("http://localhost:4000/director/getcastingcalls", {
-        headers: {
-            'Authorization': token
-        }
-    })
+    const res = await axiosInstance.get("/director/getcastingcalls")
     return res.data
 })
 
 export const deleteCastingCall = createAsyncThunk('deleteCastingCall', async (id) => {
-    const token = localStorage.getItem('directorToken');
-    return await axios.delete(`http://localhost:4000/director/deletecastingcall/${id}`, {
+    return await axiosInstance.delete(`/director/deletecastingcall/${id}`, {
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
+            'Content-Type': 'application/json'
         }
     })
 })
 
 export const editCastingCall = createAsyncThunk('editCastingCall', async ({ id, editedCastingCall }) => {
-    return await axios.put(`http://localhost:4000/director/editcastingcall/${id}`, editedCastingCall, {
+    return await axiosInstance.put(`/director/editcastingcall/${id}`, editedCastingCall, {
         headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': localStorage.getItem('directorToken')
+            'Content-Type': 'multipart/form-data'
         }
     })
 })
 
 export const actorDetailedCastingCall = createAsyncThunk('viewDetails', async (id) => {
-    const { data } = await axios.get(`http://localhost:4000/actor/viewdetailedcastingcall/${id}`, {
+    const { data } = await axiosInstance.get(`/actor/viewdetailedcastingcall/${id}`, {
         headers: {
-            'Content-Type': 'application/json',
-            'ActorAuthorization': localStorage.getItem('actorToken')
+            'Content-Type': 'application/json'
         }
     });
     return data

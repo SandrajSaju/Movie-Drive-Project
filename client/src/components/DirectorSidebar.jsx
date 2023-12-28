@@ -1,20 +1,19 @@
 import React from 'react';
 import { useSelector,useDispatch } from 'react-redux';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { directorLogout } from '../feature/Director/directorAuthSlice';
 import { Link } from 'react-router-dom';
+import axiosInstance from '../app/axiosInstance';
 
 
 const DirectorSidebar = () => {
     const {directorInfo} = useSelector(state=>state.directorAuth);
-    console.log(directorInfo.name);
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
     const handleDirectorLogout = async ()=>{
         try {
-            await axios.post('http://localhost:4000/director/logout');
+            await axiosInstance.post('/director/logout');
             dispatch(directorLogout())
             navigate('/explore')
         } catch (error) {

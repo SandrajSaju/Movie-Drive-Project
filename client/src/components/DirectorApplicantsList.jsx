@@ -1,6 +1,6 @@
 import React, { useEffect,useState} from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../app/axiosInstance';
 
 const DirectorApplicantsList = () => {
     const [applications,setApplications] = useState([])
@@ -8,11 +8,7 @@ const DirectorApplicantsList = () => {
 
     const getApplicants = async () => {
         try {
-            const {data} = await axios.get(`http://localhost:4000/director/getapplicants/${id}`,{
-                headers: {
-                    'Authorization': localStorage.getItem('directorToken')
-                }
-            });
+            const {data} = await axiosInstance.get(`/director/getapplicants/${id}`);
             setApplications(data)
         } catch (error) {
             console.log(error);
@@ -27,11 +23,7 @@ const DirectorApplicantsList = () => {
 
     const handleApproveActor = async (applicationId) => {
         try {
-            await axios.post(`http://localhost:4000/director/approveactor/${applicationId}`, null, {
-                headers: {
-                    'Authorization': localStorage.getItem('directorToken')
-                }
-            });
+            await axiosInstance.post(`/director/approveactor/${applicationId}`);
         } catch (error) {
             console.log(error);
         }
@@ -39,11 +31,7 @@ const DirectorApplicantsList = () => {
 
     const handleRejectActor = async (applicationId) => {
         try {
-            await axios.post(`http://localhost:4000/director/rejectactor/${applicationId}`, null, {
-                headers: {
-                    'Authorization': localStorage.getItem('directorToken')
-                }
-            });
+            await axiosInstance.post(`/director/rejectactor/${applicationId}`);
         } catch (error) {
             console.log(error);
         }

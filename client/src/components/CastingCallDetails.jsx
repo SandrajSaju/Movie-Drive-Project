@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { actorDetailedCastingCall } from '../feature/CastingCalls/castingCallsSlice';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import axiosInstance from '../app/axiosInstance';
 
 const CastingCallDetails = () => {
     const dispatch = useDispatch();
@@ -29,34 +29,12 @@ const CastingCallDetails = () => {
 
     const handleApplyCastingCall = async (id) => {
         try {
-            const token = localStorage.getItem('actorToken')
-            console.log(token);
-            await axios.post(`http://localhost:4000/actor/applycastingcall/${id}`, null, {
-                headers: {
-                    'actorauthorization': token
-                }
-            });
+            await axiosInstance.post(`/actor/applycastingcall/${id}`);
             dispatch(actorDetailedCastingCall(id))
         } catch (error) {
             toast.error(error.response.data.error)
         }
     }
-
-    const  handleCancelApplication = async () => {
-        try {
-            const token = localStorage.getItem('actorToken')
-            console.log(token);
-            await axios.post(`http://localhost:4000/actor/cancelapplication/${id}`, null, {
-                headers: {
-                    'actorauthorization': token
-                }
-            });
-            dispatch(actorDetailedCastingCall(id))
-        } catch (error) {
-            toast.error(error.response.data.error)
-        }
-    }
-
 
     return (
         <>

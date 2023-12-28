@@ -1,13 +1,13 @@
 const Actor = require('../models/actorModel');
 const CastingCall = require('../models/castingCallModel');
 const Director = require('../models/directorModel');
-const { generateAdminToken } = require('../utils/generateToken');
+const { generateToken } = require('../utils/generateToken');
 
 const adminLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-            const adminToken = generateAdminToken(res, email)
+            const adminToken = generateToken(res, email,"admin")
             res.status(200).json({ email, adminToken })
         } else {
             res.status(400).json({ error: "Invalid Email or password" })

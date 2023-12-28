@@ -5,6 +5,7 @@ import castingCallsSlice from "./CastingCalls/castingCallsSlice";
 import actorOtpSlice from "./Actor/actorOtpSlice";
 import adminAuthSlice from "./Admin/adminAuthSlice";
 import actorApplicationsSlice from "./Applications/actorApplicationsSlice";
+import directorOtpSlice from "./Director/directorOtpSlice";
 
 const store = configureStore({
     reducer:{
@@ -13,7 +14,8 @@ const store = configureStore({
         adminAuth:adminAuthSlice,
         castingCalls:castingCallsSlice,
         actorOtp:actorOtpSlice,
-        actorApplications:actorApplicationsSlice
+        actorApplications:actorApplicationsSlice,
+        directorOtp:directorOtpSlice
     }
 })
 

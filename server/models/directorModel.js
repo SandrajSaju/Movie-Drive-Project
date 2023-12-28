@@ -14,7 +14,8 @@ const directorSchema = mongoose.Schema({
         required: true
     },
     certificates: [{
-        type: String
+        type: String,
+        required:true
     }],
     profile: {
         gender: {

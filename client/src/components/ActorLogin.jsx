@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux'
 import { setActorCredentials, setActorToken } from '../feature/Actor/actorAuthSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import axiosInstance from '../app/axiosInstance';
 
 function ActorLogin() {
     const dispatch = useDispatch();
@@ -33,7 +33,7 @@ function ActorLogin() {
     const handleActorLogin = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('http://localhost:4000/actor/login', formData);
+            const { data } = await axiosInstance.post('/actor/login', formData);
             console.log(data);
             dispatch(setActorCredentials(data.actor));
             dispatch(setActorToken(data.actorToken));
@@ -43,14 +43,14 @@ function ActorLogin() {
             })
             navigate('/actor/home')
         } catch (error) {
-            toast.error(error.response.data.error);
-            console.log(error.response.data.error);
+            toast.error(error?.response?.data?.error);
+            console.log(error?.response?.data?.error);
         }
     }
 
     const loginWithGoogle = async (googleFormData) => {
         try {
-            const { data } = await axios.post('http://localhost:4000/actor/googlelogin', googleFormData);
+            const { data } = await axiosInstance.post('/actor/googlelogin', googleFormData);
             console.log(data);
             console.log(data.existingActor);
             console.log(data.newActor);

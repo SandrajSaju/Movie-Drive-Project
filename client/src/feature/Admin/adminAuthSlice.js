@@ -13,12 +13,13 @@ const adminAuthSlice = createSlice({
             localStorage.setItem('adminEmail', JSON.stringify(action.payload))
         },
         setAdminToken:(state,action)=>{
-            localStorage.setItem('adminToken', action.payload)
+            localStorage.setItem('token', action.payload)
+            console.log(action.payload);
         },
         adminLogout: (state, action) => {
             state.adminEmail = null;
             localStorage.removeItem("adminEmail");
-            localStorage.removeItem("adminToken");
+            localStorage.removeItem("token");
         }
     }
 })

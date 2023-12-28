@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
-import axios from 'axios';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axiosInstance from '../app/axiosInstance';
 
 
 const DirectorCreateCastingCall = () => {
-    const token = localStorage.getItem('directorToken');
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
         title: '',
@@ -48,10 +47,9 @@ const DirectorCreateCastingCall = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post('http://localhost:4000/director/createcastingcall', formData, {
+            const { data } = await axiosInstance.post('/director/createcastingcall', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': token
+                    'Content-Type': 'multipart/form-data'
                 }
             });
             navigate('/director/castingcalls')

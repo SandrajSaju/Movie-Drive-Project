@@ -18,7 +18,7 @@ const DirectorApplications = () => {
                     <div className="-my-8 divide-y-2 divide-gray-100">
                         <h1 className="text-3xl font-extrabold title-font mb-10 text-gray-900 tracking-wider text-center">Applications</h1>
                         {
-                           castingCalls && castingCalls.map(castingCall => (
+                           castingCalls && castingCalls?.map(castingCall => (
                                 <div className="py-8 flex flex-wrap md:flex-nowrap">
                                     <div className="md:w-64 md:mb-0 mb-6 flex-shrink-0 flex flex-col">
                                         {/* <span className="font-semibold title-font text-gray-700">CASTING CALL</span> */}

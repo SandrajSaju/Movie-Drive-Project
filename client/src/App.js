@@ -24,6 +24,12 @@ import DirectorApplicationsScreen from './screens/DirectorApplicationsScreen';
 import DirectorApplicantsListScreen from './screens/DirectorApplicantsListScreen';
 import ActorApplicationsScreen from './screens/ActorApplicationsScreen';
 import DirectorOtpVerificationScreen from './screens/DirectorOtpVerificationScreen';
+import AdminDirectorManagement from './screens/AdminDirectorManagement';
+import AdminDirectorRequestsScreen from './screens/AdminDirectorRequestsScreen';
+import ActorListDirectorsScreen from './screens/ActorListDirectorsScreen';
+import DirectorProfileScreen from './screens/DirectorProfileScreen';
+import ApplicantDetailsScreen from './screens/ApplicantDetailsScreen';
+import GooglePasswordVerificationScreen from './screens/GooglePasswordVerificationScreen';
 
 function App() {
   return (
@@ -36,6 +42,7 @@ function App() {
           <Route path='/actor/signup' element={<ActorSignupScreen />} />
           <Route path='/actor/login' element={<ActorLoginScreen />} />
           <Route path='/actor/verifyotp' element={<ActorOtpVerificationScreen />} />
+          <Route path='/actor/verifygooglepassword' element={<GooglePasswordVerificationScreen />} />
         </Route>
 
         <Route element={<Public role='director' />}>
@@ -55,6 +62,7 @@ function App() {
           <Route path='/actor/viewprofile' element={<ActorProfilePage />} />
           <Route path='/actor/castingcalldetails/:id' element={<CastingCallDetailsScreen />} />
           <Route path='/actor/applications' element={<ActorApplicationsScreen />} />
+          <Route path='/actor/listdirectors' element={<ActorListDirectorsScreen />} />
         </Route>
 
         <Route element={<DirectorProtect />}>
@@ -63,10 +71,14 @@ function App() {
           <Route path='/director/addcastingcall' element={<DirectorAddCastingCallScreen />} />
           <Route path='/director/applications' element={<DirectorApplicationsScreen />} />
           <Route path='/director/applications/:id' element={<DirectorApplicantsListScreen />} />
+          <Route path='/director/viewprofile' element={<DirectorProfileScreen />} />
+          <Route path='/director/getactordetails' element={<ApplicantDetailsScreen />} />
         </Route>
 
         <Route element={<AdminProtect />}>
-          <Route path='/admin/home' element={<AdminActorManagement />} />
+          <Route path='/admin/getallactors' element={<AdminActorManagement />} />
+          <Route path='/admin/getalldirectors' element={<AdminDirectorManagement />} />
+          <Route path='/admin/getdirectorrequests' element={<AdminDirectorRequestsScreen />} />
         </Route>
 
       </Routes>

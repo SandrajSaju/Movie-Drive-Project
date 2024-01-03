@@ -1,4 +1,5 @@
 const Actor = require('../models/actorModel');
+const Director = require('../models/directorModel')
 const { generateToken } = require('../utils/generateToken');
 const CastingCall = require('../models/castingCallModel');
 const Application = require('../models/applicationModel');
@@ -21,7 +22,7 @@ const actorLogin = async (req, res) => {
                 if (actor.isBlocked === true) {
                     return res.status(400).json({ error: "Your Account is been blocked" });
                 }
-                const actorToken = generateToken(res, actor._id,"actor")
+                const actorToken = generateToken(res, actor._id, "actor")
                 res.status(200).json({ actor, actorToken })
             } else {
                 return res.status(400).json({ error: "Email or password does not match" });
@@ -40,11 +41,13 @@ const googleLogin = async (req, res) => {
         const { name, email, picture } = req.body
         console.log(req.body)
         const existingActor = await Actor.findOne({ email })
-        if (existingActor && existingActor.isVerified === true) {
-            const actorToken = generateActorToken(res, existingActor._id);
-            res.status(200).json({ existingActor, actorToken })
-        } else {
-            let password = (Math.floor(Math.random() * 900000) + 100000).toString();
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let randomString = '';
+
+            for (let i = 0; i < 8; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                randomString += characters.charAt(randomIndex);
+            }
 
             let transporter = nodemailer.createTransport({
                 service: 'gmail',
@@ -57,8 +60,8 @@ const googleLogin = async (req, res) => {
             let mailOptions = {
                 from: "sandrajdevamangalam@gmail.com",
                 to: email,
-                subject: "Movie Drive Otp Verification Mail",
-                text: `Welcome to Movie Drive developed by Sandraj Saju.Your password for login in is ${password}.`
+                subject: "Random Password for login ",
+                text: `Welcome to Movie Drive developed by Sandraj Saju.Your password for login in is ${randomString}.`
             };
 
             transporter.sendMail(mailOptions, function (error, info) {
@@ -68,8 +71,8 @@ const googleLogin = async (req, res) => {
                     console.log("Email sent:" + info.response);
                 }
             });
-            const hashedPassword = await bcrypt.hash(password, saltRounds)
-
+            const hashedPassword = await bcrypt.hash(randomString, saltRounds)
+        if (!existingActor) {
             const newActor = await Actor.create({
                 name,
                 email,
@@ -78,8 +81,34 @@ const googleLogin = async (req, res) => {
                 },
                 password: hashedPassword
             })
-            const actorToken = generateActorToken(res, newActor._id);
-            res.status(200).json({ newActor, actorToken })
+            res.status(200).json({message:"random generated password sent to your mail",email:newActor.email})
+        } else {
+            existingActor.password = hashedPassword;
+            existingActor.save();
+            res.status(200).json({message:"random generated password sent to your mail",email:existingActor.email})
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.status(400).json({ error: error.message });
+    }
+}
+
+const googleVerifyPassword = async (req,res) => {
+    try {
+        const { email, password } = req.body;
+        const existingActor = await Actor.findOne({email});
+        if (existingActor.isBlocked === true) {
+            return res.status(400).json({ error: "Your Account is been blocked" });
+        }
+        const isPasswordMatch = await bcrypt.compare(password, existingActor.password);
+        if(isPasswordMatch){
+            if(existingActor.isVerified === false) {
+                existingActor.isVerified = true
+            }
+            const actorToken = generateToken(res, existingActor._id, "actor")
+            res.status(200).json({ existingActor, actorToken })
+        }else{
+            res.status(400).json({ error: "Wrong Password" });
         }
     } catch (error) {
         console.log(error.message)
@@ -148,6 +177,51 @@ const actorSignup = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 }
+
+
+const actorResendOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const existingActor = await Actor.findOne({ email });
+        if (existingActor) {
+            let otp = Math.floor(Math.random() * 9000) + 1000;
+
+            let transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: "sandrajdevamangalam@gmail.com",
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            });
+
+            let mailOptions = {
+                from: "sandrajdevamangalam@gmail.com",
+                to: email,
+                subject: "Movie Drive Otp Verification Mail",
+                text: `Welcome to Movie Drive developed by Sandraj Saju.Your Otp for Verification is ${otp}.`
+            };
+
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log("Email sent:" + info.response);
+                }
+            });
+
+            res.status(201).json({
+                email: existingActor.email,
+                otp: otp
+            });
+        } else {
+            return res.status(400).json({ error: "Something Unexpected Happened" });
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.status(400).json({ error: error.message });
+    }
+}
+
 
 const actorLogout = (req, res) => {
     res.status(200).json({
@@ -276,7 +350,7 @@ const applyCastingCall = async (req, res) => {
 
 const cancelApplication = async (req, res) => {
     try {
-        const { castingCallId,applicationId } = req.params;
+        const { castingCallId, applicationId } = req.params;
         const castingCall = await CastingCall.findById(castingCallId);
 
         const actorIndex = castingCall.appliedActors.findIndex((actor) => req.actorId)
@@ -340,7 +414,7 @@ const ActorUploadVideo = async (req, res) => {
 
 const getActorApplications = async (req, res) => {
     try {
-        const applications = await Application.find({ actor: req.actorId ,status:{$ne:"Cancelled"}})
+        const applications = await Application.find({ actor: req.actorId, status: { $ne: "Cancelled" } })
             .populate('actor')
             .populate({
                 path: 'castingCall',
@@ -356,6 +430,27 @@ const getActorApplications = async (req, res) => {
     }
 }
 
+const actorGetAllDirectors = async (req, res) => {
+    try {
+        const allDirectors = await Director.find({ isAdminApproved: true, isBlocked: false });
+        res.status(200).json(allDirectors)
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+const actorSearchDirector = async (req, res) => {
+    try {
+        const { text } = req.body;
+        const directors = await Director.find({ name: new RegExp(text, 'i'), isAdminApproved: true, isBlocked: false });
+        res.status(200).json(directors)
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 module.exports = {
     actorLogin,
     googleLogin,
@@ -368,5 +463,9 @@ module.exports = {
     applyCastingCall,
     cancelApplication,
     ActorUploadVideo,
-    getActorApplications
+    getActorApplications,
+    actorGetAllDirectors,
+    actorSearchDirector,
+    actorResendOtp,
+    googleVerifyPassword
 }

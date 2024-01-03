@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import axiosInstance from '../app/axiosInstance';
+import { setActorEmail } from '../feature/Actor/googleVerificationSlice';
 
 function ActorLogin() {
     const dispatch = useDispatch();
@@ -52,20 +53,8 @@ function ActorLogin() {
         try {
             const { data } = await axiosInstance.post('/actor/googlelogin', googleFormData);
             console.log(data);
-            console.log(data.existingActor);
-            console.log(data.newActor);
-
-            // Assuming your backend returns actor credentials and token
-            if(data.existingActor){
-                dispatch(setActorCredentials(data.existingActor));
-            }else{
-                dispatch(setActorCredentials(data.newActor));
-            }
-            
-            dispatch(setActorToken(data.actorToken));
-
-            // Optionally, you can navigate the user to the home page or another page after successful login
-            navigate('/actor/home');
+            dispatch(setActorEmail(data.email))
+            navigate('/actor/verifygooglepassword');
         } catch (error) {
             toast.error(error.response.data.error);
             console.log(error.response.data.error);

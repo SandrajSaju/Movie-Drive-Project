@@ -1,63 +1,56 @@
-import React, { useState } from 'react';
+import React from 'react';
 import axiosInstance from '../app/axiosInstance';
 
-const AdminListActors = ({ actors, fetchActors }) => {
-    console.log(actors);
+const AdminListDirectors = ({ directors, fetchDirectors }) => {
 
-    const handleBlockActor = async (id) => {
+    const handleBlockDirector = async (id) => {
         try {
-            await axiosInstance.post(`/admin/blockactor/${id}`);
-            fetchActors();
+            await axiosInstance.post(`/admin/blockdirector/${id}`);
+            fetchDirectors();
         } catch (error) {
 
         }
     }
 
-    const handleUnblockActor = async (id) => {
+    const handleUnblockDirector = async (id) => {
         try {
-            await axiosInstance.post(`/admin/unblockactor/${id}`);
-            fetchActors();
+            await axiosInstance.post(`/admin/unblockdirector/${id}`);
+            fetchDirectors();
         } catch (error) {
 
         }
     }
-
-    return (
-        <div className="container mx-auto p-4 w-4/5 max-md:w-3/5 ml-80 mt-24">
-            <h1 className='text-3xl font-bold title-font mb-10 text-gray-900 tracking-wider text-center'>Actors' Details</h1>
+  return (
+    <>
+      <div className="container mx-auto p-4 w-4/5 max-md:w-3/5 ml-80 mt-24">
+            <h1 className='text-3xl font-bold title-font mb-10 text-gray-900 tracking-wider text-center'>Directors' Details</h1>
             <table className="min-w-full bg-white border border-gray-200 rounded-xl shadow-lg">
                 <thead>
                     <tr>
                         <th className="py-2 px-4 border-b">Image</th>
                         <th className="py-2 px-4 border-b">Name</th>
-                        <th className="py-2 px-4 border-b">Age</th>
-                        <th className="py-2 px-4 border-b">Gender</th>
                         <th className="py-2 px-4 border-b">Email</th>
-                        <th className="py-2 px-4 border-b">Phone Number</th>
                         <th className="py-2 px-4 border-b">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {actors.map((actor) => (
-                        <tr key={actor._id}>
-                            <td className="border-b"><img className='w-12 h-12 m-auto' src={actor.profile.profileImage} alt='' /></td>
-                            <td className="py-2 px-4 border-b text-center">{actor.name}</td>
-                            <td className="py-2 px-4 border-b text-center">{actor.profile.age}</td>
-                            <td className="py-2 px-4 border-b text-center">{actor.profile.gender}</td>
-                            <td className="py-2 px-4 border-b text-center">{actor.email}</td>
-                            <td className="py-2 px-4 border-b text-center">{actor.phoneNumber}</td>
+                    {directors.map((director) => (
+                        <tr key={director._id}>
+                            <td className="border-b"><img className='w-12 h-12 m-auto' src={director?.profile?.profileImage} alt='' /></td>
+                            <td className="py-2 px-4 border-b text-center">{director.name}</td>
+                            <td className="py-2 px-4 border-b text-center">{director.email}</td>
                             <td className="py-2 px-4 border-b text-center space-x-3">
 
-                                {actor.isBlocked ? (
+                                {director.isBlocked ? (
                                     <button
                                         className={`ml-2 px-4 py-2 w-24 text-white bg-green-600 hover:bg-green-800`}
-                                        onClick={() => handleUnblockActor(actor._id)}
+                                        onClick={() => handleUnblockDirector(director._id)}
                                     >Unblock
                                     </button>
                                 ) : (
                                     <button
                                         className={`ml-2 px-4 py-2 w-24 text-white bg-red-600 hover:bg-red-800`}
-                                        onClick={() => handleBlockActor(actor._id)}
+                                        onClick={() => handleBlockDirector(director._id)}
                                     >Block
                                     </button>
                                 )}
@@ -74,7 +67,8 @@ const AdminListActors = ({ actors, fetchActors }) => {
                 </tbody>
             </table>
         </div>
-    );
-};
+    </>
+  )
+}
 
-export default AdminListActors;
+export default AdminListDirectors

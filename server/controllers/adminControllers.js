@@ -26,6 +26,15 @@ const adminGetActors = async (req, res) => {
     }
 }
 
+const adminGetDirectors = async (req,res) => {
+    try {
+        const allDirectors = await Director.find({isAdminApproved:true});
+        res.status(200).json(allDirectors)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
 const adminLogout = (req, res) => {
     res.status(200).json({
         success: true,
@@ -57,10 +66,72 @@ const adminUnblockActor = async (req,res) => {
     }
 }
 
+const adminBlockDirector = async (req,res) => {
+    try {
+        const {id} = req.params;
+        const director = await Director.findById(id);
+        director.isBlocked = true;
+        await director.save()
+        res.status(200).json({message:"director Blocked Successfully"})
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+const adminUnblockDirector = async (req,res) => {
+    try {
+        const {id} = req.params;
+        const director = await Director.findById(id);
+        director.isBlocked = false;
+        await director.save();
+        res.status(200).json({message:"Director Blocked Successfully"})
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+const getDirectorRequests = async (req, res)=> {
+    try {
+        const allDirectorRequests = await Director.find({isAdminApproved:false});
+        res.status(200).json(allDirectorRequests)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+const adminApproveDirector = async (req,res) => {
+    try {
+        const {id} = req.params;
+        const director = await Director.findById(id);
+        director.isAdminApproved = true;
+        await director.save()
+        res.status(200).json({message:"Director Approved Successfully"})
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+const adminRejectDirector = async (req,res) => {
+    try {
+        const {id} = req.params;
+        await Director.findByIdAndDelete(id);
+        res.status(200).json({message:"Director Approved Successfully"})
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+
 module.exports = {
     adminLogin,
     adminGetActors,
     adminLogout,
     adminBlockActor,
-    adminUnblockActor
+    adminUnblockActor,
+    adminGetDirectors,
+    adminBlockDirector,
+    adminUnblockDirector,
+    getDirectorRequests,
+    adminApproveDirector,
+    adminRejectDirector
 }

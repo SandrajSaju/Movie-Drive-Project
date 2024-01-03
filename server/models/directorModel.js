@@ -15,7 +15,7 @@ const directorSchema = mongoose.Schema({
     },
     certificates: [{
         type: String,
-        required:true
+        required: true
     }],
     profile: {
         gender: {
@@ -24,7 +24,14 @@ const directorSchema = mongoose.Schema({
         phoneNumber: {
             type: Number
         },
-        movies: [String]
+        movies: [String],
+        bio: {
+            type: String
+        },
+        profileImage: {
+            type: String,
+            default:"https://png.pngtree.com/png-vector/20220807/ourmid/pngtree-man-avatar-wearing-gray-suit-png-image_6102786.png"
+        }
     },
     castingCalls: [{
         type: mongoose.Schema.Types.ObjectId,

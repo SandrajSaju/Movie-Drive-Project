@@ -126,7 +126,7 @@ const DirectorCastingCalls = () => {
 
     // const pageNumbers = Math.ceil(castingCalls.length / castingCallsPerPage);
 
-    if (castingCalls && castingCalls.length === 0) {
+    if (castingCalls && castingCalls?.length === 0) {
         return (
             <>
                 <section className="text-gray-600 body-font w-4/5 max-md:w-3/5 ml-96 max-md:ml-44">

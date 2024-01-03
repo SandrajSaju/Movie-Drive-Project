@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const multer = require('multer');
-const {directorLogin,directorSignup,directorLogout,createCastingCall,getDirectorCastingCalls,deleteCastingCall,editCastingCall, directorApproveActor, directorRejectActor, directorGetApplications, directorVerifyOtp} = require('../controllers/directorControllers');
+const {directorLogin,directorSignup,directorLogout,createCastingCall,getDirectorCastingCalls,deleteCastingCall,editCastingCall, directorApproveActor, directorRejectActor, directorGetApplications, directorVerifyOtp, updateDirectorProfile, directorGetActorDetails} = require('../controllers/directorControllers');
 const {verifyToken} = require('../middlewares/authMiddleware')
 
 const castingCallImageStorage = multer.memoryStorage({
@@ -18,7 +18,15 @@ const certificateStorage = multer.memoryStorage({
       cb(null, `${uniqueSuffix}-${file.originalname}`);
     },
 });
-const directorCertificatesUpload = multer({ storage: certificateStorage })
+const directorCertificatesUpload = multer({ storage: certificateStorage });
+
+const directorProfileImageStorage = multer.memoryStorage({
+    filename:function(req,file,cb){
+        const uniqueSuffix = Date.now();
+        cb(null,`${uniqueSuffix}-${file.originalname}`);
+    }
+});
+const directorProfileImageUpload = multer({storage:directorProfileImageStorage});
   
 
 router.post("/login",directorLogin)
@@ -32,5 +40,7 @@ router.put('/editcastingcall/:id',verifyToken,castingCallImageUpload.single("ima
 router.get('/getapplicants/:id',verifyToken,directorGetApplications)
 router.post('/approveactor/:id',verifyToken,directorApproveActor);
 router.post('/rejectactor/:id',verifyToken,directorRejectActor);
+router.post('/updateprofile', verifyToken, directorProfileImageUpload.single("profileImage"),updateDirectorProfile);
+router.get('/getactordetails/:id',verifyToken,directorGetActorDetails)
 
 module.exports = router

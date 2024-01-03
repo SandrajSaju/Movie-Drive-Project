@@ -1,14 +1,18 @@
-import React, { useEffect,useState} from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../app/axiosInstance';
+import { useDispatch } from 'react-redux';
+import { getActorDetails } from '../feature/Director/directorActorSlice';
 
 const DirectorApplicantsList = () => {
-    const [applications,setApplications] = useState([])
+    const [applications, setApplications] = useState([])
     const { id } = useParams();
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const getApplicants = async () => {
         try {
-            const {data} = await axiosInstance.get(`/director/getapplicants/${id}`);
+            const { data } = await axiosInstance.get(`/director/getapplicants/${id}`);
             setApplications(data)
         } catch (error) {
             console.log(error);
@@ -21,9 +25,15 @@ const DirectorApplicantsList = () => {
 
     console.log(applications);
 
+    const handleFetchActorDetails = (actorId) => {
+        dispatch(getActorDetails(actorId));
+        navigate('/director/getactordetails')
+    }
+
     const handleApproveActor = async (applicationId) => {
         try {
             await axiosInstance.post(`/director/approveactor/${applicationId}`);
+            getApplicants()
         } catch (error) {
             console.log(error);
         }
@@ -32,6 +42,7 @@ const DirectorApplicantsList = () => {
     const handleRejectActor = async (applicationId) => {
         try {
             await axiosInstance.post(`/director/rejectactor/${applicationId}`);
+            getApplicants()
         } catch (error) {
             console.log(error);
         }
@@ -47,22 +58,26 @@ const DirectorApplicantsList = () => {
                         <tr>
                             <th className="py-2 px-4 border-b">Image</th>
                             <th className="py-2 px-4 border-b">Name</th>
+                            <th className="py-2 px-4 border-b">Status</th>
                             <th className="py-2 px-4 border-b">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {applications && applications.map((application) => (
+                        {applications && applications?.map((application) => (
                             <tr key={application._id}>
                                 <td className="border-b"><img className='w-20 h-16 object-cover object-center m-auto' src={application.actor.profile.profileImage} alt='' /></td>
                                 <td className="py-2 px-4 border-b text-center">{application.actor.name}</td>
+                                <td className="py-2 px-4 border-b text-center">{application.status}</td>
                                 <td className="py-2 px-4 border-b text-center space-x-3">
 
                                     <button
                                         className={`ml-2 px-4 py-2 w-32 bg-slate-500 text-white hover:bg-slate-700`}
-                                    // onClick={() => handleViewProfileButton(actor._id)}
+                                        onClick={() => handleFetchActorDetails(application.actor._id)}
                                     >View Profile
                                     </button>
-                                    <button
+                                    {application?.status === "Pending" ? (
+                                        <>
+                                        <button
                                         className={`ml-2 px-4 py-2 w-24 text-white bg-green-600 hover:bg-green-800`}
                                         onClick={() => handleApproveActor(application._id)}
                                     >Approve
@@ -73,7 +88,8 @@ const DirectorApplicantsList = () => {
                                     >
                                         Reject
                                     </button>
-
+                                    </>
+                                    ) : ("")}
                                 </td>
                             </tr>
                         ))}

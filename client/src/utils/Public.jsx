@@ -13,7 +13,7 @@ const Public = ({ role }) => {
     role === 'actor' ? !!actorInfo : role === 'director' ? !!directorInfo : !!adminEmail;
 
   const redirectPath =
-    role === 'actor' ? '/actor/home' : role === 'director' ? '/director/home' : '/admin/home';
+    role === 'actor' ? '/actor/home' : role === 'director' ? '/director/home' : '/admin/getallactors';
 
   return (
     <>

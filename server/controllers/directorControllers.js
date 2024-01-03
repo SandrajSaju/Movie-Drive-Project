@@ -1,4 +1,5 @@
 const Director = require('../models/directorModel');
+const Actor = require('../models/actorModel')
 const CastingCall = require('../models/castingCallModel');
 const Application = require('../models/applicationModel');
 const { generateToken } = require('../utils/generateToken');
@@ -20,6 +21,9 @@ const directorLogin = async (req, res) => {
             }
             const isPasswordMatch = await bcrypt.compare(password, director.password)
             if (isPasswordMatch) {
+                if(director.isBlocked){
+                    return res.status(400).json({ error: "You have been blocked by the Admin" })
+                }
                 const directorToken = generateToken(res, director._id, "director")
                 res.status(200).json({
                     director: director,
@@ -349,6 +353,65 @@ const directorRejectActor = async (req, res) => {
     }
 }
 
+const updateDirectorProfile = async (req, res) => {
+    try {
+        const { name,phoneNumber,gender,bio } = req.body;
+        const director = await Director.findOne({ _id: req.directorId })
+        director.name = name || director.name;
+        director.profile.phoneNumber = phoneNumber || director.profile.phoneNumber;
+        director.profile.bio = bio || director.profile.bio
+        director.profile.gender = gender || director.profile.gender;
+
+        if (req.file) {
+            const imagekit = new ImageKit({
+                publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+                privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+                urlEndpoint: process.env.IMAGEKIT_URL_END_POINT,
+            });
+
+            const uploadImage = () => {
+                return new Promise((resolve, reject) => {
+                    imagekit.upload(
+                        {
+                            file: req.file.buffer,
+                            fileName: `${Date.now()}-${req.file.originalname}`
+                        },
+                        (error, result) => {
+                            if (error) {
+                                console.log("Error uploading image to imagekit", error);
+                                reject(error);
+                            } else {
+                                resolve(result.url);
+                            }
+                        }
+                    )
+                })
+            }
+            const imageUrl = await uploadImage();
+            console.log(imageUrl);
+            director.profile.profileImage = imageUrl || director.profile.profileImage
+        }
+
+        await director.save();
+        res.status(200).json({ message: "Director Profile Updated Successfully", director })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" })
+    }
+}
+
+const directorGetActorDetails = async (req,res) => {
+    try {
+        const actorId = req.params.id;
+        const actor = await Actor.findById(actorId);
+        res.status(200).json(actor)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal Server Error" })
+    }
+}
+
 module.exports = {
     directorLogin,
     directorSignup,
@@ -360,5 +423,7 @@ module.exports = {
     directorGetApplications,
     directorApproveActor,
     directorRejectActor,
-    directorVerifyOtp
+    directorVerifyOtp,
+    updateDirectorProfile,
+    directorGetActorDetails
 }

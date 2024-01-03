@@ -16,16 +16,44 @@ function ActorSignup() {
         password: '',
         confirmPassword: ''
     })
+    const [errors , setErrors] = useState({
+        name:'',
+        email:'',
+        phoneNumber:'',
+        password:'',
+        confirmPassword:'',
+    })
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
             ...prevData, [name]: value
+        }));
+
+        setErrors((prevErrors)=>({
+            ...prevErrors,
+            [name]:''
         }))
     }
 
     const handleActorSignUp = async (e) => {
         e.preventDefault();
+        let formIsValid = true;
+        const newErrors = {};
+
+        Object.keys(formData).forEach((key)=>{
+            if(formData[key].trim() === ''){
+                formIsValid = false;
+                newErrors[key] = 'This field is required';
+            }
+        });
+
+        if (!formIsValid) {
+            console.log(newErrors);
+            setErrors(newErrors);
+            return;
+        }
+
         try {
             const {data} = await axiosInstance.post('/actor/signup', formData);
             console.log(data);
@@ -49,23 +77,28 @@ function ActorSignup() {
                         <h2 className="text-gray-900 text-xl font-bold text-center title-font mb-5">Actor Sign Up</h2>
                         <div className="relative mb-4">
                             <label for="full-name" className="leading-7 text-sm text-gray-600">Full Name</label>
-                            <input type="text" id="full-name" value={formData.name} onChange={handleInputChange} name="name" className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                            <input type="text" id="full-name" value={formData.name} onChange={handleInputChange} name="name" className={`w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out ${errors.name && 'border-red-500'}`} />
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                         </div>
                         <div class="relative mb-4">
                             <label for="email" className="leading-7 text-sm text-gray-600">Email</label>
-                            <input type="email" id="email" value={formData.email} onChange={handleInputChange} name="email" className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                            <input type="email" id="email" value={formData.email} onChange={handleInputChange} name="email" className={`w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out ${errors.name && 'border-red-500'}`} />
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                         </div>
                         <div class="relative mb-4">
                             <label for="phoneNumber" className="leading-7 text-sm text-gray-600">Phone Number</label>
-                            <input type="phone-number" id="phone-number" value={formData.phoneNumber} onChange={handleInputChange} name="phoneNumber" className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                            <input type="phone-number" id="phone-number" value={formData.phoneNumber} onChange={handleInputChange} name="phoneNumber" className={`w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out ${errors.name && 'border-red-500'}`} />
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                         </div>
                         <div class="relative mb-4">
                             <label for="password" className="leading-7 text-sm text-gray-600">Password</label>
-                            <input type="password" id="password" value={formData.password} onChange={handleInputChange} name="password" className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                            <input type="password" id="password" value={formData.password} onChange={handleInputChange} name="password" className={`w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out ${errors.name && 'border-red-500'}`} />
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                         </div>
                         <div class="relative mb-4">
                             <label for="password" className="leading-7 text-sm text-gray-600">Confirm Password</label>
-                            <input type="password" id="confirm-password" value={formData.confirmPassword} onChange={handleInputChange} name="confirmPassword" className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" />
+                            <input type="password" id="confirm-password" value={formData.confirmPassword} onChange={handleInputChange} name="confirmPassword" className={`w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out ${errors.name && 'border-red-500'}`} />
+                            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                         </div>
                         <button onClick={handleActorSignUp} className="text-white bg-slate-500 border-0 py-2 px-8 focus:outline-none hover:bg-slate-700 rounded text-lg">Sign Up</button>
                         <p class="text-xs text-gray-500 mt-3 text-center">Already registered? <Link to='/actor/login'>Login here</Link></p>

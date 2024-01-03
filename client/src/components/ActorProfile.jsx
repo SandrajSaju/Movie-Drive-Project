@@ -162,7 +162,7 @@ const ActorProfile = () => {
                         {actorInfo.profile.profileVideos.map((videoUrl, index) => (
                             <div key={index} className="relative">
                                 <video
-                                    className="w-full h-80 object-cover"
+                                    className="w-full h-80 object-cover rounded-xl"
                                     controls
                                 >
                                     <source src={videoUrl} type="video/mp4" />
@@ -178,7 +178,7 @@ const ActorProfile = () => {
                 {isEditing && (
                     <div className="fixed inset-0 flex items-center justify-center z-50 overflow-y-auto">
                         <div className="absolute inset-0 bg-black opacity-50"></div>
-                        <div className="z-10 bg-white p-8 max-w-md w-full h-full max-h-screen overflow-y-auto rounded-lg">
+                        <div className="z-10 bg-white p-8 max-w-md max-h-screen overflow-y-auto rounded-lg relative">
                             <h2 className="text-2xl font-bold mb-4 text-center">Edit Profile</h2>
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">

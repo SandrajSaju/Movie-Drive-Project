@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const multer = require('multer')
-const { actorLogin, actorSignup, actorLogout, getAllCastingCalls, updateActorProfile, googleLogin, verifyOtp, actorViewDetailedCastingCall, applyCastingCall, cancelApplication, ActorUploadVideo, getActorApplications, actorCancelApplication} = require("../controllers/actorControllers")
+const { actorLogin, actorSignup, actorLogout, getAllCastingCalls, updateActorProfile, googleLogin, verifyOtp, actorViewDetailedCastingCall, applyCastingCall, cancelApplication, ActorUploadVideo, getActorApplications, actorGetAllDirectors, actorSearchDirector, actorResendOtp, googleVerifyPassword} = require("../controllers/actorControllers")
 const { verifyToken } = require("../middlewares/authMiddleware")
 
 const profileImageStorage = multer.memoryStorage({
@@ -32,6 +32,10 @@ router.post('/applycastingcall/:id',verifyToken,applyCastingCall);
 router.post('/cancelapplication/:castingCallId/:applicationId',verifyToken,cancelApplication);
 router.post('/uploadvideo', verifyToken, videoUpload.single("video"), ActorUploadVideo);
 router.get('/getactorapplications',verifyToken,getActorApplications);
+router.get('/getalldirectors',verifyToken,actorGetAllDirectors);
+router.post('/getsearcheddirectors',verifyToken,actorSearchDirector);
+router.post('/resendotp',actorResendOtp);
+router.post('/googleverifypassword',googleVerifyPassword)
 
 
 module.exports = router
